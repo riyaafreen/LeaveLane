@@ -186,11 +186,19 @@
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
+    // --- Dynamic Name Extraction ---
     const hour = new Date().getHours();
-    const name = sessionStorage.getItem("fullName") || "riya";
-    const email = sessionStorage.getItem("email") || "riya@gmail.com";
+    const email = sessionStorage.getItem("email") || "aly@company.com";
     
-    document.getElementById("greeting").innerText = hour < 12 ? `Good Morning, ${name}!` : hour < 17 ? `Good Afternoon, ${name}!` : `Good Evening, ${name}!`;
+    // Extract "aly" from "aly@company.com" and capitalize it to "Aly"
+    const rawName = email.split('@')[0];
+    const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+    
+    let greetingText = "Good Evening";
+    if (hour < 12) greetingText = "Good Morning";
+    else if (hour < 18) greetingText = "Good Afternoon";
+    
+    document.getElementById("greeting").innerText = `${greetingText}, ${name}!`;
     document.getElementById("mName").innerText = name;
     document.getElementById("mEmail").innerText = email;
 
@@ -206,7 +214,7 @@
         .then(data => { alert(data); location.reload(); });
     }
 
-    let allLeaveData = []; // Store data globally for searching
+    let allLeaveData = []; 
 
     fetch("/leave")
     .then(response => response.json())
@@ -264,7 +272,7 @@
     // Renders the Table Data
     function renderTable(dataToRender) {
         let body = document.getElementById("leaveBody");
-        body.innerHTML = ""; // Clear existing rows
+        body.innerHTML = ""; 
 
         dataToRender.forEach(leave => {
             // Calculate Leave Duration in Days

@@ -298,18 +298,25 @@
     }
 
     // Intelligent Dynamic Time Greeting
+    // Intelligent Dynamic Time Greeting (Extracts name from email)
     function setGreeting() {
         const hour = new Date().getHours();
-        const rawName = sessionStorage.getItem("fullName") || "Employee";
-        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-        let greeting = "Good Evening";
         
+        // Grab the logged-in email, default to 'employee' if missing
+        const email = sessionStorage.getItem("email") || "employee@company.com";
+        
+        // Extract the part before the '@' symbol (e.g., adam@gmail.com -> adam)
+        const rawName = email.split('@')[0];
+        
+        // Capitalize the first letter (e.g., adam -> Adam)
+        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        
+        let greeting = "Good Evening";
         if (hour < 12) greeting = "Good Morning";
         else if (hour < 18) greeting = "Good Afternoon";
         
         document.getElementById("greetingText").innerText = `${greeting}, ${name}`;
     }
-
     // High-Accuracy Live Clock
     function updateClock() { 
         const now = new Date();
