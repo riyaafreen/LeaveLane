@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join LeaveLane | Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=ranade@400,600,800&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --brand-green: #6BB62D; --light-green: #84cc16; --deep-green: #1b4332; --bg: #f2ede0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: #1a2420; line-height: 1.6; }
+
+        /* --- BACKGROUND ANIMATION --- */
+        .bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .bg-grid { position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background-image: linear-gradient(to right, rgba(27, 67, 50, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(27, 67, 50, 0.08) 1px, transparent 1px); background-size: 50px 50px; transform: rotate(-12deg); animation: gridShift 8s linear infinite; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.5; z-index: -1; }
+        .blob-1 { width: 400px; height: 400px; background: var(--brand-green); top: -100px; left: -100px; }
+        .blob-2 { width: 300px; height: 300px; background: var(--deep-green); bottom: -50px; right: -50px; }
+
+        /* --- HEADER --- */
+        header { padding: 40px 60px; max-width: 1200px; margin: 0 auto; }
+        .brand-wrapper { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .brand { font-family: 'Ranade'; font-size: 28px; font-weight: 800; color: var(--deep-green); }
+
+        /* --- HERO --- */
+        .hero { display: flex; align-items: center; justify-content: space-between; padding: 40px 60px; max-width: 1200px; margin: 0 auto; min-height: 70vh; }
+        .register-card { background: white; padding: 50px; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        
+        /* --- INPUTS --- */
+        .input-group { position: relative; margin-bottom: 20px; }
+        input { width: 100%; padding: 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 16px; transition: 0.3s; }
+        input:focus { outline: none; border-color: var(--brand-green); box-shadow: 0 0 10px rgba(107, 182, 45, 0.3); }
+        
+        .password-wrapper { position: relative; }
+        .password-wrapper input { margin-bottom: 0; padding-right: 50px; } /* Prevent text from hiding under icon */
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 20px; opacity: 0.7; user-select: none; transition: opacity 0.2s; }
+        .toggle-password:hover { opacity: 1; }
+
+        /* --- BUTTONS & LINKS --- */
+        .btn-register { width: 100%; padding: 16px; background: var(--deep-green); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-register:hover { background: var(--light-green); transform: translateY(-2px); }
+        .btn-register:active { box-shadow: 0 0 0 4px rgba(107, 182, 45, 0.5); transform: translateY(0); }
+        
+        .security-note { font-size: 11px; color: #6b7280; text-align: center; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 500;}
+        .signin-link { text-align: center; margin-top: 20px; font-size: 14px; color: #4b5563; }
+        .signin-link a { color: var(--brand-green); font-weight: 600; text-decoration: none; }
+        .signin-link a:hover { text-decoration: underline; }
+
+        /* --- FEATURES & HOW IT WORKS --- */
+        .section-container { padding: 80px 60px; max-width: 1200px; margin: 0 auto; text-align: center; }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+        .feature-item { padding: 40px; background: white; border-radius: 20px; border: 2px solid var(--brand-green); transition: 0.3s; }
+        .feature-item:hover { transform: scale(1.05); }
+
+        @keyframes gridShift { 0% { transform: rotate(-12deg) translate(0, 0); } 100% { transform: rotate(-12deg) translate(50px, 50px); } }
+    </style>
+</head>
+<body>
+
+<div class="bg-canvas">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="bg-grid"></div>
+</div>
+
+<header>
+    <a href="index.html" class="brand-wrapper" style="text-decoration:none;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6BB62D" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <div class="brand">Leave<span style="font-style:italic; color:var(--brand-green)">Lane</span></div>
+    </a>
+</header>
+
+<section class="hero">
+    <div>
+        <h1 style="font-family:'Ranade'; font-size: 52px; color:var(--deep-green);">Simplify Your<br>Leave Management</h1>
+        <p style="font-size: 18px; color:#4b5563; margin-top: 20px;">Join thousands of teams using LeaveLane to<br>streamline approvals and track time off.</p>
+        <div style="margin-top: 40px; border-left: 4px solid var(--brand-green); padding-left: 20px;">
+            <h3 style="font-family:'Ranade'; font-size: 20px; color:var(--deep-green);">One Platform. Seamless Leave Management.</h3>
+            <p style="color:#4b5563; max-width: 450px; margin-top: 5px;">Everything you need to manage employee leave with confidence.</p>
+        </div>
+    </div>
+    
+    <div class="register-card">
+        <h2 style="margin-bottom: 25px; font-family:'Ranade'; font-size: 24px;">Create Account</h2>
+        
+        <div class="input-group">
+            <input type="text" id="name" placeholder="Full Name">
+        </div>
+        
+        <div class="input-group">
+            <input type="email" id="email" placeholder="Email Address">
+        </div>
+        
+        <div class="input-group password-wrapper">
+            <input type="password" id="password" placeholder="Password">
+            <span class="toggle-password" id="togglePasswordBtn" onclick="togglePassword()">👁️</span>
+        </div>
+        
+        <button class="btn-register" onclick="registerUser()">Get Started</button>
+        <div class="security-note">🔒 Your information is securely stored and protected.</div>
+        
+        <div class="signin-link">
+            Already have an account? <a href="login.html">Sign In.</a>
+        </div>
+    </div>
+</section>
+
+<section class="section-container">
+    <h2 style="font-family:'Ranade'; font-size: 36px; color: var(--deep-green);">Why LeaveLane?</h2>
+    <div class="feature-grid">
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">Intuitive Dashboard</h3>
+            <p>Get a bird's-eye view of your remaining leave balances.</p>
+        </div>
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">Instant Requests</h3>
+            <p>Apply for leave in just a few clicks and receive instant updates.</p>
+        </div>
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">Effortless Management</h3>
+            <p>Real-time tracking of your history and holiday planning.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section-container">
+    <h2 style="font-family:'Ranade'; font-size: 36px; color: var(--deep-green);">How it Works</h2>
+    <div class="feature-grid">
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">1. Create Your Account</h3>
+            <p>Register in seconds with your name, email, and password.</p>
+        </div>
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">2. Submit Leave Requests</h3>
+            <p>Apply for leave by selecting dates, category, and reason.</p>
+        </div>
+        <div class="feature-item">
+            <h3 style="color: var(--deep-green);">3. Track & Manage</h3>
+            <p>Monitor approvals and view your complete leave history.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    function togglePassword() {
+        const passInput = document.getElementById("password");
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        
+        if (passInput.type === "password") {
+            passInput.type = "text";
+            toggleBtn.innerHTML = "🙈"; 
+        } else {
+            passInput.type = "password";
+            toggleBtn.innerHTML = "👁️"; 
+        }
+    }
+
+    function registerUser() {
+        const user = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
+        fetch("/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(user)
+        })
+        .then(r => r.text())
+        .then(data => { alert(data); window.location.href = "login.html"; });
+    }
+</script>
+</body>
+</html>

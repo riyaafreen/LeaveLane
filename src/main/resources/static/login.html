@@ -1,0 +1,551 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - LeaveLane</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=ranade@400,500,700,800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f2ede0; 
+            color: #1a2420;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- 1. GLOBAL BACKGROUND CANVAS ENGINE (SLOW CONTINUOUS ANIMATIONS) --- */
+        .bg-canvas {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(to right, rgba(27, 67, 50, 0.07) 1.5px, transparent 1.5px),
+                linear-gradient(to bottom, rgba(27, 67, 50, 0.07) 1.5px, transparent 1.5px);
+            background-size: 50px 50px;
+            transform: rotate(-12deg);
+            z-index: 3;
+            animation: gridShift 60s linear infinite;
+        }
+
+        /* Ambient Micro-Blobs Morphing and Floating in Open Spaces */
+        .tiny-blob {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(107, 182, 45, 0.4) 0%, rgba(64, 145, 108, 0.3) 100%);
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: 1;
+        }
+
+        .blob-1 {
+            width: 240px;
+            height: 240px;
+            top: 15%;
+            left: 8%;
+            animation: slowDrift1 22s infinite alternate ease-in-out;
+        }
+
+        .blob-2 {
+            width: 190px;
+            height: 190px;
+            bottom: 15%;
+            right: 8%;
+            background: linear-gradient(135deg, rgba(45, 106, 79, 0.35) 0%, rgba(116, 198, 157, 0.25) 100%);
+            animation: slowDrift2 26s infinite alternate ease-in-out;
+        }
+
+        /* Subtle Geometric Floating Shapes */
+        .random-shape {
+            position: absolute;
+            border: 1.5px solid rgba(27, 67, 50, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            z-index: 2;
+        }
+
+        .geo-1 {
+            width: 45px;
+            height: 45px;
+            top: 25%;
+            right: 22%;
+            animation: randomMove1 38s infinite linear;
+        }
+
+        .geo-2 {
+            width: 30px;
+            height: 30px;
+            bottom: 25%;
+            left: 25%;
+            border-style: dashed;
+            animation: randomMove2 45s infinite linear;
+        }
+
+        /* --- 2. GLOBAL TOP NAVBAR --- */
+        .top-bar {
+            position: relative;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 60px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .header-logo {
+            width: 26px;
+            height: 26px;
+            color: #6BB62D; 
+        }
+
+        .small-title {
+            font-family: 'Ranade', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #1b4332;
+        }
+
+        .small-title span {
+            font-style: italic;
+            color: #6BB62D;
+        }
+
+        #datetime {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(27, 67, 50, 0.12);
+            padding: 10px 22px;
+            border-radius: 30px;
+            color: #243029;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 15px rgba(27, 67, 50, 0.03);
+        }
+
+        /* --- 3. REFINED LOGIN CARD (GLASSMORPHISM EMBEDDED) --- */
+        .container {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            width: 460px;
+            max-width: 100%;
+            min-height: 520px; /* Made the card a little taller */
+            padding: 45px 40px; /* Adjusted padding to reduce empty space */
+            border-radius: 28px;
+            backdrop-filter: blur(24px); 
+            box-shadow: 0 30px 70px rgba(27, 67, 50, 0.05), 
+                        0 10px 20px rgba(0, 0, 0, 0.02);
+            animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Small Icon above Welcome Back */
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(107, 182, 45, 0.1);
+            color: #6BB62D;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+        }
+
+        .card-header h2 {
+            font-family: 'Ranade', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            color: #0b1a14;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .card-header p {
+            color: #55635a;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* --- 4. FLOATING LABEL INPUT FIELDS --- */
+        .form-group {
+            position: relative;
+            margin-bottom: 22px; /* Slightly reduced to manage empty space */
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #4a5750;
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .input-wrapper {
+            position: relative; /* Required for the absolute positioning of the eye icon */
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1.5px solid rgba(27, 67, 50, 0.1);
+            padding: 15px 18px;
+            border-radius: 14px;
+            font-size: 15px;
+            color: #0b1a14;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Interactive active border style when field is clicked */
+        .input-wrapper input:focus {
+            background: #ffffff;
+            border-color: #6BB62D;
+            box-shadow: 0 0 0 4px rgba(107, 182, 45, 0.12),
+                        0 4px 12px rgba(107, 182, 45, 0.05);
+        }
+
+        .form-group:focus-within label {
+            color: #6BB62D; /* Label shifts color context along with input focus */
+        }
+
+        /* Password Visibility Toggle */
+        .input-wrapper input[type="password"],
+        .input-wrapper input[type="text"]#password {
+            padding-right: 45px; /* Prevent text from going under the icon */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        /* --- 5. PREMIUM ACTION INTERACTIVES --- */
+        .submit-btn {
+            width: 100%;
+            background: #1b4332; 
+            color: #ffffff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(27, 67, 50, 0.15);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 5px;
+            margin-bottom: 12px;
+        }
+
+        .submit-btn:hover {
+            background:#6BB62D;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(27, 67, 50, 0.25);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Subtle Security Line */
+        .security-text {
+            font-size: 11px;
+            color: #728076;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .signup-prompt {
+            text-align: center;
+            font-size: 14px;
+            color: #55635a;
+            font-weight: 500;
+        }
+
+        .signup-link {
+            color: #1b4332;
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 6px;
+            display: inline-block;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .signup-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
+            bottom: -1px;
+            left: 0;
+            background-color: #6BB62D;
+            transform-origin: bottom right;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .signup-link:hover {
+            color: #6BB62D;
+        }
+
+        .signup-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* --- 6. FOOTER --- */
+        .footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 30px;
+            color: #728076;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(27, 67, 50, 0.08);
+        }
+
+        /* --- 7. AUTOMATED ANIMATION TIMELINES --- */
+        @keyframes gridShift {
+            0% { background-position: 0 0; }
+            100% { background-position: 1000px 1000px; }
+        }
+
+        @keyframes slowDrift1 {
+            0% { transform: translate(0, 0) scale(1); border-radius: 50%; }
+            100% { transform: translate(35px, -25px) scale(1.08); border-radius: 42% 58% 50% 50%; }
+        }
+
+        @keyframes slowDrift2 {
+            0% { transform: translate(0, 0) scale(1.05); }
+            100% { transform: translate(-30px, 30px) scale(0.95); }
+        }
+
+        @keyframes randomMove1 {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-30px, 50px) rotate(360deg); }
+        }
+
+        @keyframes randomMove2 {
+            0% { transform: translate(0, 0) rotate(360deg); }
+            100% { transform: translate(40px, -20px) rotate(0deg); }
+        }
+
+        @keyframes cardEntrance {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .top-bar { padding: 20px; }
+            .login-card { padding: 40px 24px; min-height: auto; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-canvas">
+        <div class="tiny-blob blob-1"></div>
+        <div class="tiny-blob blob-2"></div>
+        <div class="random-shape geo-1"></div>
+        <div class="random-shape geo-2"></div>
+        <div class="bg-grid"></div>
+    </div>
+
+    <header class="top-bar">
+        <div class="brand-wrapper" onclick="location.href='index.html'">
+            <svg class="header-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div class="small-title">Leave<span>Lane</span></div>
+        </div>
+        <div id="datetime">Connecting System Engine...</div>
+    </header>
+
+    <main class="container">
+        <section class="login-card">
+            
+            <div class="card-header">
+                <div class="header-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to access your LeaveLane account</p>
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" placeholder="Enter your email address" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                        <span class="toggle-password" id="togglePasswordBtn" onclick="togglePassword()">👁️</span>
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="loginUser()">
+                   Sign In
+                </button>
+
+                <div class="security-text">
+                    🔒 Your credentials are securely protected and encrypted in the login page
+                </div>
+
+                <div class="signup-prompt">
+                    New to the platform?<a href="register.html" class="signup-link">Create an account</a>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="footer">
+        Secure Gateway Module &bull; End-to-End Encrypted Session
+    </footer>
+
+    <script>
+    function togglePassword() {
+        const passInput = document.getElementById("password");
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        
+        if (passInput.type === "password") {
+            passInput.type = "text";
+            toggleBtn.innerHTML = "🙈"; // Hide icon
+        } else {
+            passInput.type = "password";
+            toggleBtn.innerHTML = "👁️"; // Show icon
+        }
+    }
+
+    function loginUser() {
+        const user = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
+
+        fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(user)
+        })
+        .then(response => response.text())
+        .then(data => {
+            if(data === "EMPLOYEE") {
+                sessionStorage.setItem("role", "EMPLOYEE");
+                sessionStorage.setItem("email", user.email);
+                window.location.href = "dashboard.html";
+            }
+            else if(data === "MANAGER") {
+                sessionStorage.setItem("role", "MANAGER");
+                sessionStorage.setItem("email", user.email);
+                window.location.href = "manager.html";
+            }
+            else {
+                alert(data);
+            }
+        });
+    }
+
+    function updateDateTime(){
+        const now = new Date();
+        document.getElementById("datetime").innerHTML = 
+            now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + 
+            " | " + 
+            now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    </script>
+
+</body>
+</html>

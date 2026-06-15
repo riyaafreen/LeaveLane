@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - LeaveLane</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=ranade@400,600,800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <style>
+        :root { --brand-green: #6BB62D; --deep-green: #1b4332; --bg: #f2ede0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background: var(--bg); color: #1a2420; min-height: 100vh; overflow-x: hidden; position: relative; display: flex; flex-direction: column; }
+
+        /* --- 1. BACKGROUND ANIMATION ENGINE --- */
+        .bg-canvas { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 1; pointer-events: none; overflow: hidden; 
+        }
+
+        .bg-grid {
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: 
+                linear-gradient(to right, rgba(27, 67, 50, 0.07) 1.5px, transparent 1.5px),
+                linear-gradient(to bottom, rgba(27, 67, 50, 0.07) 1.5px, transparent 1.5px);
+            background-size: 50px 50px; transform: rotate(-12deg); z-index: 2;
+            animation: gridShift 60s linear infinite;
+        }
+
+        .tiny-blob { position: absolute; background: linear-gradient(135deg, rgba(107, 182, 45, 0.4) 0%, rgba(64, 145, 108, 0.3) 100%); border-radius: 50%; filter: blur(40px); z-index: 1; }
+        .blob-1 { width: 300px; height: 300px; top: 15%; left: 8%; animation: slowDrift1 22s infinite alternate ease-in-out; }
+        .blob-2 { width: 250px; height: 250px; bottom: 15%; right: 8%; background: linear-gradient(135deg, rgba(45, 106, 79, 0.35) 0%, rgba(116, 198, 157, 0.25) 100%); animation: slowDrift2 26s infinite alternate ease-in-out; }
+
+        .random-shape { position: absolute; border: 1.5px solid rgba(27, 67, 50, 0.25); background: rgba(255, 255, 255, 0.1); border-radius: 4px; z-index: 2; }
+        .geo-1 { width: 45px; height: 45px; top: 25%; right: 22%; animation: randomMove1 38s infinite linear; }
+        .geo-2 { width: 30px; height: 30px; bottom: 25%; left: 25%; border-style: dashed; animation: randomMove2 45s infinite linear; }
+
+        /* --- 2. HEADER NAV --- */
+        header { display: flex; justify-content: space-between; padding: 30px 60px; align-items: center; position: relative; z-index: 10; width: 100%; max-width: 1500px; margin: 0 auto; }
+        .brand-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: var(--deep-green); }
+        .header-logo { width: 26px; height: 26px; color: var(--brand-green); }
+        .small-title { font-family: 'Ranade', sans-serif; font-size: 18px; font-weight: 800; }
+        .small-title span { font-style: italic; color: var(--brand-green); }
+        #datetime { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(27, 67, 50, 0.12); padding: 10px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 15px rgba(27, 67, 50, 0.03); }
+
+        /* --- 3. MAIN LAYOUT --- */
+        .dashboard-wrapper { position: relative; z-index: 10; width: 100%; max-width: 1400px; margin: 20px auto; padding: 0 60px; display: flex; flex-direction: column; gap: 40px; flex: 1; }
+
+        .greeting-header { animation: fadeDown 0.6s ease forwards; }
+        .greeting-header h1 { font-family: 'Ranade', sans-serif; font-size: 44px; font-weight: 800; color: #0b1a14; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .greeting-header p { color: #4a5750; font-size: 16px; font-weight: 500; }
+
+        .content-grid { display: grid; grid-template-columns: 340px 1fr; gap: 80px; align-items: stretch; animation: fadeUp 0.8s ease forwards; }
+
+        /* --- 4. LEFT COLUMN (BOXLESS PIE CHART) --- */
+        .left-column { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding-top: 20px; }
+        
+        .chart-box { position: relative; width: 240px; height: 240px; border-radius: 50%; background: conic-gradient(var(--brand-green) 0% 100%, #d1d5db 100% 100%); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); transition: background 1s ease-out; }
+        .chart-box::after { content: ""; width: 190px; height: 190px; background: var(--bg); border-radius: 50%; position: absolute; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
+        .chart-text { position: relative; z-index: 2; text-align: center; }
+        .chart-text .val { font-size: 58px; font-weight: 800; font-family: 'Ranade'; color: var(--deep-green); line-height: 1; }
+        .chart-text .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #728076; letter-spacing: 1px; margin-top: 8px; }
+
+        .badge-row { display: flex; width: 100%; gap: 20px; justify-content: center; max-width: 320px; }
+        .info-badge { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(27,67,50,0.04); border: 1px solid rgba(27,67,50,0.08); padding: 18px 10px; border-radius: 16px; text-align: center; transition: 0.3s; }
+        .info-badge:hover { background: rgba(27,67,50,0.08); transform: translateY(-2px); }
+        .info-badge .b-val { font-family: 'Ranade', sans-serif; font-size: 24px; font-weight: 800; color: var(--deep-green); }
+        .info-badge .b-lbl { font-size: 11px; font-weight: 600; color: #55635a; text-transform: uppercase; }
+
+        /* --- 5. RIGHT COLUMN (LARGE ACTION BOX) --- */
+        .action-box { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 60px;
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            border-radius: 32px; 
+            padding: 70px 60px; 
+            box-shadow: 0 20px 50px rgba(27, 67, 50, 0.05); 
+            min-height: 520px; 
+        }
+
+        .action-center { flex: 1; display: flex; flex-direction: column; gap: 24px; max-width: 420px; }
+        
+        .action-btn { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 24px 35px; 
+            background: var(--deep-green); 
+            border: none;
+            border-radius: 20px; 
+            font-size: 17px; 
+            font-weight: 600; 
+            color: #ffffff; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            box-shadow: 0 8px 20px rgba(27,67,50,0.1); 
+        }
+        
+        .action-btn:hover { 
+            background: var(--brand-green); 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 25px rgba(27,67,50,0.15); 
+        }
+        
+        .action-btn .btn-content { display: flex; align-items: center; gap: 15px; }
+        .action-btn .arrow { opacity: 0.6; transition: 0.3s; font-size: 18px; }
+        .action-btn:hover .arrow { opacity: 1; transform: translateX(5px); }
+        
+        .btn-logout { background: #d32f2f; }
+        .btn-logout:hover { background: #b71c1c; box-shadow: 0 12px 25px rgba(211,47,47,0.15); }
+
+        .tooltip { position: absolute; left: 50%; bottom: 110%; transform: translateX(-50%) translateY(10px); background: #0b1a14; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); white-space: nowrap; box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 20; }
+        .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border-width: 6px; border-style: solid; border-color: #0b1a14 transparent transparent transparent; }
+        .action-btn:hover .tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .illustration-wrapper {
+            flex: 1.5; 
+            height: 450px; 
+            mix-blend-mode: multiply; 
+            pointer-events: none;
+            opacity: 0.95;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- KEYFRAMES --- */
+        @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 1000px 1000px; } }
+        @keyframes slowDrift1 { 0% { transform: translate(0, 0) scale(1); border-radius: 50%; } 100% { transform: translate(35px, -25px) scale(1.08); border-radius: 42% 58% 50% 50%; } }
+        @keyframes slowDrift2 { 0% { transform: translate(0, 0) scale(1.05); } 100% { transform: translate(-30px, 30px) scale(0.95); } }
+        @keyframes randomMove1 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-30px, 50px) rotate(360deg); } }
+        @keyframes randomMove2 { 0% { transform: translate(0, 0) rotate(360deg); } 100% { transform: translate(40px, -20px) rotate(0deg); } }
+        @keyframes fadeDown { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1150px) {
+            .content-grid { grid-template-columns: 1fr; gap: 40px; }
+            .action-box { flex-direction: column-reverse; padding: 40px; text-align: center; min-height: auto; }
+            .action-center { width: 100%; max-width: 600px; }
+            .illustration-wrapper { height: 350px; }
+            header, .dashboard-wrapper { padding: 20px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-canvas">
+    <div class="tiny-blob blob-1"></div>
+    <div class="tiny-blob blob-2"></div>
+    <div class="random-shape geo-1"></div>
+    <div class="random-shape geo-2"></div>
+    <div class="bg-grid"></div>
+</div>
+
+<header>
+    <a href="index.html" class="brand-wrapper">
+        <svg class="header-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <div class="small-title">Leave<span>Lane</span></div>
+    </a>
+    <div id="datetime">Connecting Sync...</div>
+</header>
+
+<main class="dashboard-wrapper">
+    
+    <div class="greeting-header">
+        <h1 id="greetingText">Welcome, User</h1>
+        <p>Here's a quick overview of your leave status and options</p>
+    </div>
+
+    <div class="content-grid">
+        
+        <div class="left-column">
+            
+            <div class="chart-box" id="dynamicChartBox">
+                <div class="chart-text">
+                    <div class="val" id="remainingDaysVal">--</div>
+                    <div class="lbl">Days Remaining</div>
+                </div>
+            </div>
+
+            <div class="badge-row">
+                <div class="info-badge">
+                    <span class="b-val" id="totalDaysVal">20</span>
+                    <span class="b-lbl">Annual Leave</span>
+                </div>
+                <div class="info-badge" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+                    <span class="b-val" style="color: #b11111;" id="takenDaysVal">--</span>
+                    <span class="b-lbl">Taken</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="action-box">
+            
+            <div class="action-center">
+                <button class="action-btn" onclick="location.href='applyleave.html'">
+                    <div class="tooltip">Submit a new leave application to HR</div>
+                    <div class="btn-content">
+                        <span>Apply for Leave</span>
+                    </div>
+                    <span class="arrow">➔</span>
+                </button>
+
+                <button class="action-btn" onclick="location.href='leavehistory.html'">
+                    <div class="tooltip">View previous allocations and approval status</div>
+                    <div class="btn-content">
+                        <span>Leave History & Status</span>
+                    </div>
+                    <span class="arrow">➔</span>
+                </button>
+
+                <button class="action-btn btn-logout" onclick="logout()">
+                    <div class="tooltip">Securely sign out of your terminal</div>
+                    <div class="btn-content">
+                        <span>Logout Session</span>
+                    </div>
+                    <span class="arrow">➔</span>
+                </button>
+            </div>
+
+            <div class="illustration-wrapper">
+                <lottie-player 
+                    src="illustration.json"
+                    speed="1" 
+                    style="width: 100%; height: 100%;" 
+                    loop 
+                    autoplay>
+                </lottie-player>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // Security Check
+    if(sessionStorage.getItem("role") !== "EMPLOYEE"){
+        window.location.href = "login.html";
+    }
+
+    // Dynamic Leave Balance Calculation
+    function calculateLeaveBalances() {
+        const userEmail = sessionStorage.getItem("email");
+        const TOTAL_DAYS_ALLOWANCE = 20; // Default company policy
+
+        fetch("/leave")
+            .then(response => response.json())
+            .then(data => {
+                let takenDays = 0;
+
+                // Filter for current user's APPROVED leaves
+                const myApprovedLeaves = data.filter(leave => 
+                    leave.employeeEmail === userEmail && leave.status === 'APPROVED'
+                );
+
+                // Calculate total duration of taken days
+                myApprovedLeaves.forEach(leave => {
+                    const start = new Date(leave.startDate);
+                    const end = new Date(leave.endDate);
+                    // Add +1 because leave from Monday to Monday is inclusive (1 day)
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+                    takenDays += diffDays;
+                });
+
+                let remainingDays = TOTAL_DAYS_ALLOWANCE - takenDays;
+                if (remainingDays < 0) remainingDays = 0; // Prevent negative numbers
+
+                // Update UI Numbers
+                document.getElementById("totalDaysVal").innerText = TOTAL_DAYS_ALLOWANCE;
+                document.getElementById("takenDaysVal").innerText = takenDays;
+                document.getElementById("remainingDaysVal").innerText = remainingDays;
+
+                // Dynamically update the circle chart percentage
+                const percentage = (remainingDays / TOTAL_DAYS_ALLOWANCE) * 100;
+                document.getElementById("dynamicChartBox").style.background = 
+                    `conic-gradient(var(--brand-green) 0% ${percentage}%, #d1d5db ${percentage}% 100%)`;
+            })
+            .catch(error => {
+                console.error("Failed to fetch leave data:", error);
+                document.getElementById("remainingDaysVal").innerText = "Err";
+                document.getElementById("takenDaysVal").innerText = "Err";
+            });
+    }
+
+    // Intelligent Dynamic Time Greeting
+    function setGreeting() {
+        const hour = new Date().getHours();
+        const rawName = sessionStorage.getItem("fullName") || "Employee";
+        const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        let greeting = "Good Evening";
+        
+        if (hour < 12) greeting = "Good Morning";
+        else if (hour < 18) greeting = "Good Afternoon";
+        
+        document.getElementById("greetingText").innerText = `${greeting}, ${name}`;
+    }
+
+    // High-Accuracy Live Clock
+    function updateClock() { 
+        const now = new Date();
+        const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+        const timeOptions = { hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true };
+        document.getElementById("datetime").innerText = now.toLocaleDateString('en-US', dateOptions) + " | " + now.toLocaleTimeString('en-US', timeOptions); 
+    }
+
+    // Initialize Dashboard
+    setGreeting();
+    calculateLeaveBalances();
+    setInterval(updateClock, 1000); 
+    updateClock();
+    
+    function logout() { sessionStorage.clear(); location.href = "login.html"; }
+</script>
+</body>
+</html>
